@@ -61,8 +61,6 @@ save_at: .word
 	
 	andi $t2, $k0, 0x00000100
 	bnez $t2, tick
-	#andi $t2, $t1, 0x00000200
-	#bnez $t2, transmit
 	b iend
 	
 tick:
@@ -71,14 +69,6 @@ tick:
 	lw $t1, 0($s1)
 	beqz $t1, iend
 	lw $t2, 0($s2)
-
-#transmit:
-	#lw $s3, TCR
-	#lw $s4, TDR
-	#lw $t1, 0($s3)
-	#beqz $t1, iend
-	#sw $t2, 0($s4)
-	#b iend
 
 non_int: 
 	mfc0 $k0, $14
