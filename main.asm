@@ -18,19 +18,19 @@ main:
 	jal prep_multi
 	
 # newtask (t0)
-	#la $a0,t0
-	#li $a1, 1
-	#jal newtask
+	la $a0, t0
+	li $a1, 1
+	jal newtask
 	
 # newtask(t1)	
-	#la $a0,t1
-	#li $a1,2
-	#jal newtask
+	la $a0, t1
+	li $a1, 2
+	jal newtask
 	
 # newtask(t2)
-	#la $a0,t2
-	#l1 $a2, 3
-	#jal newtask
+	la $a0, t2
+	li $a1, 3
+	jal newtask
 
 # startmulti() and continue to 
 # the infinit loop of the main function
@@ -49,40 +49,34 @@ infinit:
 
 # the support functions	
 prep_multi:
-	# part 1: initialize the process ID and next PCB pointer in each PCB
-	la $t1, PCB
-	li $t2, 0
-	li $t3, 10
-	
-init_loop:
-	sw $t2, 136($t1)
-	sw $zero, 140($t1)
-	
-	addiu $t1, $t1, 144
-	addiu $t2, $t2, 1
-	bne $t2, $t3, init_loop
-	
-	# part 2: fill the first PCB with relevant information ($sp and epc) and adjust the structures and pointers accordingly
 	la $t1, PCB
 	sw $t1, running # put pcb of main task in execution
 	sw $zero, ready # ready list starts empty since main task is already in execution
 	sw $zero, lastready
 	
-	la $t2, pcbstack # store stack pointer and EPC
+	la $t2, pcbstack # store stack pointer, EPC, PID (0) and next PCB (0) in PCB
 	la $t3, main
 	sw $t2, 112($t1)
 	sw $t3, 132($t1)
+	sw $zero, 136($t1)
+	sw $zero, 140($t1)
 	
 	addiu $t1, $t1, 144 # increment 1 position in PCB and stack
-	addiu $t2, $t2, 32 
+	addiu $t2, $t2, 32
 	sw $t1, freepcb # store new freepcb and freestack addresses
 	sw $t2, freestack
 	
 	jr $ra
 	
 newtask:
-	# write your code here
-	#jr $ra
+	lw $t1, freepcb
+	
+	#sw $a1, 136($t1)
+	# "create" new task (does NOT switch to the task, just creates it. switching is handled in ISR)
+	# allocate pcb
+	# add necessary values (use a0 and a1 to determine task and pid)
+	# add it to ready list and set last ready pointer
+	jr $ra
     
 start_multi:
 	move $s0, $ra
@@ -91,8 +85,8 @@ start_multi:
 	jr $ra 
 
 	.globl main
+	.include "interrupt.asm"
 	.include "t0.asm"
 	.include "t1.asm"
 	.include "t2.asm"
-	.include "interrupt.asm"
 #END

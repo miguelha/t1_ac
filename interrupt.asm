@@ -63,12 +63,14 @@ int_enable:
 	# now use k0 that has already been saved to save registers that cannot be directly saved
 	mfhi $k0
 	sw $k0, running+124
-	mflo $ko
+	mflo $k0
 	sw $k0, running+128
 	mfc0 $k0, $14
 	sw $k0, running+132
 	move $k0, $at
 	sw $k0, running
+	
+	
 	
 	mfc0 $k0, $13
 	srl $t1, $k0, 2
@@ -82,29 +84,62 @@ int_enable:
 	
 tick:
 	lw $s1, RCR
-	lw $s2, RDR
 	lw $t1, 0($s1)
 	beqz $t1, iend
-	lw $t2, 0($s2)
+	
+	# switching logic
+	
+	b iend
 
-non_int: 
+non_int:
 	mfc0 $k0, $14
 	addiu $k0, $k0, 4
 	mtc0 $k0, $14
 	
 iend:
-	# load all the registers from the PCB of the new process in execution to finish context switching
-	lw $t1, save_t1
-	lw $t2, save_t2
-	lw $s1, save_s1
-	lw $s2, save_s2
-	lw $s3, save_s3
-	lw $s4, save_s4
-	lw $a0, save_a0
-	lw $v0, save_v0
+	# the new task must be changed to execution (running) before restoring the register values
 	
-	lw $k0, save_at
+	# use k0 before it has been loaded to load registers that cannot be directly loaded
+	lw $k0, running+124
+	mthi $k0
+	lw $k0, running+128
+	mtlo $k0
+	lw $k0, running+132
+	mtc0 $k0
+	lw $k0, running
 	move $at, $k0
+	# now load the rest of the registers directly
+	lw $v0, running+4
+	lw $v1, running+8
+	lw $a0, running+12
+	lw $a1, running+16
+	lw $a2, running+20
+	lw $a3, running+24
+	lw $t0, running+28
+	lw $t1, running+32
+	lw $t2, running+36
+	lw $t3, running+40
+	lw $t4, running+44
+	lw $t5, running+48
+	lw $t6, running+52
+	lw $t7, running+56
+	lw $s0, running+60
+	lw $s1, running+64
+	lw $s2, running+68
+	lw $s3, running+72
+	lw $s4, running+76
+	lw $s5, running+80
+	lw $s6, running+84
+	lw $s7, running+88
+	lw $t8, running+92
+	lw $t9, running+96
+	lw $k0, running+100
+	lw $k1, running+104
+	lw $gp, running+108
+	lw $sp, running+112
+	lw $fp, running+116
+	lw $ra, running+120
+
 	mtc0 $zero, $13
 	mfc0 $k0, $12
 	andi $k0, 0xfffd
