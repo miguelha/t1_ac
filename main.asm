@@ -7,6 +7,7 @@ ready: .word
 lastready: .word
 
 pcbstack: .space 320 # 8*4 bytes per stack for 10 tasks
+freestack: .word
 	
 STRING_done: .asciiz "Multitask started\n"
 STRING_main: .asciiz "Task Zero\n"
@@ -48,14 +49,35 @@ infinit:
 
 # the support functions	
 prep_multi:
-	# write your code here
+	# part 1: initialize the process ID and next PCB pointer in each PCB
 	la $t1, PCB
-	sw $t1, freepcb
-	sw $t1, running
-	sw $zero, ready
+	li $t2, 0
+	li $t3, 10
+	
+init_loop:
+	sw $t2, 136($t1)
+	sw $zero, 140($t1)
+	
+	addiu $t1, $t1, 144
+	addiu $t2, $t2, 1
+	bne $t2, $t3, init_loop
+	
+	# part 2: fill the first PCB with relevant information ($sp and epc) and adjust the structures and pointers accordingly
+	la $t1, PCB
+	sw $t1, running # put pcb of main task in execution
+	sw $zero, ready # ready list starts empty since main task is already in execution
 	sw $zero, lastready
-	addi $t1, $t1, 144
-	sw $t1, freepcb
+	
+	la $t2, pcbstack # store stack pointer and EPC
+	la $t3, main
+	sw $t2, 112($t1)
+	sw $t3, 132($t1)
+	
+	addiu $t1, $t1, 144 # increment 1 position in PCB and stack
+	addiu $t2, $t2, 32 
+	sw $t1, freepcb # store new freepcb and freestack addresses
+	sw $t2, freestack
+	
 	jr $ra
 	
 newtask:

@@ -27,31 +27,48 @@ int_enable:
 	
 	
 # interrupt handler
-.kdata
-save_t1: .word
-save_t2: .word
-save_s1: .word
-save_s2: .word
-save_s3: .word
-save_s4: .word
-save_a0: .word
-save_v0: .word
-save_at: .word
-
 .ktext 0x80000180
 
-# save every used register as needed
+	# save all registers from the current process needed for context switching to the PCB (prepare to switch tasks)
+	sw $v0, running+4
+	sw $v1, running+8
+	sw $a0, running+12
+	sw $a1, running+16
+	sw $a2, running+20
+	sw $a3, running+24
+	sw $t0, running+28
+	sw $t1, running+32
+	sw $t2, running+36
+	sw $t3, running+40
+	sw $t4, running+44
+	sw $t5, running+48
+	sw $t6, running+52
+	sw $t7, running+56
+	sw $s0, running+60
+	sw $s1, running+64
+	sw $s2, running+68
+	sw $s3, running+72
+	sw $s4, running+76
+	sw $s5, running+80
+	sw $s6, running+84
+	sw $s7, running+88
+	sw $t8, running+92
+	sw $t9, running+96
+	sw $k0, running+100
+	sw $k1, running+104
+	sw $gp, running+108
+	sw $sp, running+112
+	sw $fp, running+116
+	sw $ra, running+120
+	# now use k0 that has already been saved to save registers that cannot be directly saved
+	mfhi $k0
+	sw $k0, running+124
+	mflo $ko
+	sw $k0, running+128
+	mfc0 $k0, $14
+	sw $k0, running+132
 	move $k0, $at
-	sw $k0, save_at
-	
-	sw $t1, save_t1
-	sw $t2, save_t2
-	sw $s1, save_s1
-	sw $s2, save_s2
-	sw $s3, save_s3
-	sw $s4, save_s4
-	sw $a0, save_a0
-	sw $v0, save_v0
+	sw $k0, running
 	
 	mfc0 $k0, $13
 	srl $t1, $k0, 2
@@ -76,6 +93,7 @@ non_int:
 	mtc0 $k0, $14
 	
 iend:
+	# load all the registers from the PCB of the new process in execution to finish context switching
 	lw $t1, save_t1
 	lw $t2, save_t2
 	lw $s1, save_s1
