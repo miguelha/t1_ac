@@ -69,17 +69,36 @@ prep_multi:
 	jr $ra
 	
 newtask:
-	lw $t1, freepcb
+	lw $t1, freepcb # load freepcb and freestack addresses
+	lw $t2, freestack
 	
-	#sw $a1, 136($t1)
-	# "create" new task (does NOT switch to the task, just creates it. switching is handled in ISR)
-	# allocate pcb
-	# add necessary values (use a0 and a1 to determine task and pid)
-	# add it to ready list and set last ready pointer
+	sw $t2, 112($t1) # set new task PCB stack pointer, EPC, PID and next PCB
+	sw $a0, 132($t1) 
+	sw $a1, 136($t1)
+	sw $zero, 140($t1)
+	
+	lw $t3, ready # load ready list and check if its the first task
+	beqz $t3, firsttask
+	
+	lw $t4, lastready # not the first task, process accordingly
+	sw $t1, 140($t4)
+	sw $t1, lastready
+	b newtaskend
+	
+firsttask: 
+	sw $t1, ready # is the first task, process accordingly
+	sw $t1, lastready
+	
+newtaskend:
+	addiu $t1, $t1, 144 # increment 1 position in PCB and stack
+	addiu $t2, $t2, 32
+	sw $t1, freepcb # store new freepcb and freestack addresses
+	sw $t2, freestack
+
 	jr $ra
     
 start_multi:
-	move $s0, $ra
+	move $s0, $ra # enable interrupts, ensuring that $ra isn't lost in nested subroutine calls
 	jal int_enable
 	move $ra, $s0
 	jr $ra 

@@ -88,7 +88,18 @@ tick:
 	beqz $t1, iend
 	
 	# switching logic
+	lw $t1, running
+	lw $t2, ready
 	
+	lw $t3, 140($t2) # remove the first element in the ready list
+	sw $t3, ready
+	
+	lw $t4, lastready
+	sw $t1, 140($t4)
+	sw $t1, lastready
+	sw $zero, 140($t1)
+	
+	#sw $t2, running
 	b iend
 
 non_int:
@@ -105,7 +116,7 @@ iend:
 	lw $k0, running+128
 	mtlo $k0
 	lw $k0, running+132
-	mtc0 $k0
+	mtc0 $k0, $14
 	lw $k0, running
 	move $at, $k0
 	# now load the rest of the registers directly
