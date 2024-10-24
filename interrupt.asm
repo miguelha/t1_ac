@@ -30,45 +30,46 @@ int_enable:
 .ktext 0x80000180
 
 	# save all registers from the current process needed for context switching to the PCB (prepare to switch tasks)
-	sw $v0, running+4
-	sw $v1, running+8
-	sw $a0, running+12
-	sw $a1, running+16
-	sw $a2, running+20
-	sw $a3, running+24
-	sw $t0, running+28
-	sw $t1, running+32
-	sw $t2, running+36
-	sw $t3, running+40
-	sw $t4, running+44
-	sw $t5, running+48
-	sw $t6, running+52
-	sw $t7, running+56
-	sw $s0, running+60
-	sw $s1, running+64
-	sw $s2, running+68
-	sw $s3, running+72
-	sw $s4, running+76
-	sw $s5, running+80
-	sw $s6, running+84
-	sw $s7, running+88
-	sw $t8, running+92
-	sw $t9, running+96
-	sw $k0, running+100
-	sw $k1, running+104
-	sw $gp, running+108
-	sw $sp, running+112
-	sw $fp, running+116
-	sw $ra, running+120
-	# now use k0 that has already been saved to save registers that cannot be directly saved
-	mfhi $k0
-	sw $k0, running+124
-	mflo $k0
-	sw $k0, running+128
-	mfc0 $k0, $14
-	sw $k0, running+132
-	move $k0, $at
-	sw $k0, running
+	lw $k0, running
+	sw $v0, 4($k0)
+	sw $v1, 8($k0)
+	sw $a0, 12($k0)
+	sw $a1, 16($k0)
+	sw $a2, 20($k0)
+	sw $a3, 24($k0)
+	sw $t0, 28($k0)
+	sw $t1, 32($k0)
+	sw $t2, 36($k0)
+	sw $t3, 40($k0)
+	sw $t4, 44($k0)
+	sw $t5, 48($k0)
+	sw $t6, 52($k0)
+	sw $t7, 56($k0)
+	sw $s0, 60($k0)
+	sw $s1, 64($k0)
+	sw $s2, 68($k0)
+	sw $s3, 72($k0)
+	sw $s4, 76($k0)
+	sw $s5, 80($k0)
+	sw $s6, 84($k0)
+	sw $s7, 88($k0)
+	sw $t8, 92($k0)
+	sw $t9, 96($k0)
+	sw $k0, 100($k0)
+	sw $k1, 104($k0)
+	sw $gp, 108($k0)
+	sw $sp, 112($k0)
+	sw $fp, 116($k0)
+	sw $ra, 120($k0)
+	# now use k1 to save registers that cannot be directly saved
+	mfhi $k1
+	sw $k1, 124($k0)
+	mflo $k1
+	sw $k1, 128($k0)
+	mfc0 $k1, $14
+	sw $k1, 132($k0)
+	move $k1, $at
+	sw $k1, 0($k0)
 	
 	
 	
@@ -110,46 +111,46 @@ non_int:
 iend:
 	# the new task must be changed to execution (running) before restoring the register values
 	
-	# use k0 before it has been loaded to load registers that cannot be directly loaded
-	lw $k0, running+124
-	mthi $k0
-	lw $k0, running+128
-	mtlo $k0
-	lw $k0, running+132
-	mtc0 $k0, $14
 	lw $k0, running
-	move $at, $k0
+	lw $k1, 124($k0)
+	mthi $k1
+	lw $k1, 128($k0)
+	mtlo $k1
+	lw $k1, 132($k0)
+	mtc0 $k1, $14
+	lw $k1, 0($k0)
+	move $at, $k1
 	# now load the rest of the registers directly
-	lw $v0, running+4
-	lw $v1, running+8
-	lw $a0, running+12
-	lw $a1, running+16
-	lw $a2, running+20
-	lw $a3, running+24
-	lw $t0, running+28
-	lw $t1, running+32
-	lw $t2, running+36
-	lw $t3, running+40
-	lw $t4, running+44
-	lw $t5, running+48
-	lw $t6, running+52
-	lw $t7, running+56
-	lw $s0, running+60
-	lw $s1, running+64
-	lw $s2, running+68
-	lw $s3, running+72
-	lw $s4, running+76
-	lw $s5, running+80
-	lw $s6, running+84
-	lw $s7, running+88
-	lw $t8, running+92
-	lw $t9, running+96
-	lw $k0, running+100
-	lw $k1, running+104
-	lw $gp, running+108
-	lw $sp, running+112
-	lw $fp, running+116
-	lw $ra, running+120
+	lw $v0, 4($k0)
+	lw $v1, 8($k0)
+	lw $a0, 12($k0)
+	lw $a1, 16($k0)
+	lw $a2, 20($k0)
+	lw $a3, 24($k0)
+	lw $t0, 28($k0)
+	lw $t1, 32($k0)
+	lw $t2, 36($k0)
+	lw $t3, 40($k0)
+	lw $t4, 44($k0)
+	lw $t5, 48($k0)
+	lw $t6, 52($k0)
+	lw $t7, 56($k0)
+	lw $s0, 60($k0)
+	lw $s1, 64($k0)
+	lw $s2, 68($k0)
+	lw $s3, 72($k0)
+	lw $s4, 76($k0)
+	lw $s5, 80($k0)
+	lw $s6, 84($k0)
+	lw $s7, 88($k0)
+	lw $t8, 92($k0)
+	lw $t9, 96($k0)
+	lw $k1, 104($k0)
+	lw $gp, 108($k0)
+	lw $sp, 112($k0)
+	lw $fp, 116($k0)
+	lw $ra, 120($k0)
+	lw $k0, 100($k0) # since k0 is used for addressing, it must be the last register to be restored
 
 	mtc0 $zero, $13
 	mfc0 $k0, $12

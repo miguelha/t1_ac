@@ -1,6 +1,6 @@
 # file t2.asm
 	.data
-STRING_T2A: .asciiz "\Starting Third task...\n"
+STRING_T2A: .asciiz "\nStarting Third task...\n"
 STRING_T2B: .asciiz "\nThird Task - "
 
 	.text

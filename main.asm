@@ -1,16 +1,16 @@
 #this is the entry point of the program
 	.data
 PCB: .space 1440 # 36*4 bytes per PCB for 10 PCBs
-freepcb: .word
-running: .word
-ready: .word
-lastready: .word
+freepcb: .word 0
+running: .word 0
+ready: .word 0
+lastready: .word 0
 
 pcbstack: .space 320 # 8*4 bytes per stack for 10 tasks
-freestack: .word
+freestack: .word 0
 	
 STRING_done: .asciiz "Multitask started\n"
-STRING_main: .asciiz "Task Zero\n"
+STRING_main: .asciiz "\nTask Zero"
 
 	.text
 main:

@@ -1,6 +1,6 @@
 # file t0.asm
 	.data
-STRING_T0A: .asciiz "\Starting First task...\n"
+STRING_T0A: .asciiz "\nStarting First task...\n"
 STRING_T0B:  .asciiz "\nFirst Task - "
 	
 	.text
