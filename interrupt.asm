@@ -99,7 +99,7 @@ tick:
 	sw $t1, lastready
 	sw $zero, 140($t1)
 	
-	#sw $t2, running
+	sw $t2, running
 	b iend
 
 non_int:

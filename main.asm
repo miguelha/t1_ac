@@ -55,7 +55,7 @@ prep_multi:
 	sw $zero, lastready
 	
 	la $t2, pcbstack # store stack pointer, EPC, PID (0) and next PCB (0) in PCB
-	la $t3, main
+	la $t3, infinit # main/infinit?
 	sw $t2, 112($t1)
 	sw $t3, 132($t1)
 	sw $zero, 136($t1)
