@@ -54,10 +54,8 @@ prep_multi:
 	sw $zero, ready # ready list starts empty since main task is already in execution
 	sw $zero, lastready
 	
-	la $t2, pcbstack # store stack pointer, EPC, PID (0) and next PCB (0) in PCB
-	la $t3, infinit # main/infinit?
+	la $t2, pcbstack # store stack pointer, PID (0) and next PCB (0) in PCB (no EPC anymore!)
 	sw $t2, 112($t1)
-	sw $t3, 132($t1)
 	sw $zero, 136($t1)
 	sw $zero, 140($t1)
 	
@@ -96,6 +94,7 @@ newtaskend:
 	sw $t2, freestack
 
 	jr $ra
+    
     
 start_multi:
 	move $s0, $ra # enable interrupts, ensuring that $ra isn't lost in nested subroutine calls

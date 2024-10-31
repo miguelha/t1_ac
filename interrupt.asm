@@ -6,8 +6,7 @@ ALL_INT_MASK: .word 0x0000ff00
 KBD_INT_MASK: .word 0x00000100
 RCR:	.word 	0xffff0000
 RDR:	.word	0xffff0004
-TCR:	.word	0xffff0008
-TDR:	.word	0xffff000c
+
 
 .text
 int_enable:
